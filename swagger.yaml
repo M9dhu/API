@@ -1,0 +1,443 @@
+---
+swagger: "2.0"
+info:
+  description: "An API to lint specification files according to enterprise standards"
+  version: "1.0"
+  title: "Specification Linter"
+  contact:
+    email: "apiteam@colruytgroup.com"
+host: "localhost:3000"
+basePath: "/v1"
+schemes:
+- "https"
+- "http"
+paths:
+  /linter:
+    post:
+      tags:
+      - linter
+      summary: "Lint the specification"
+      description: "Runs the linter for the provided specification and returns the\
+        \ results"
+      operationId: "runLint"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "lintRequest"
+        description: "Request data to be linted"
+        required: true
+        schema:
+          $ref: "#/definitions/LintRequest"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/LintResponse"
+        "405":
+          description: "Invalid input"
+      security:
+      - api_key: []
+      x-swagger-router-controller: "LinterController"
+  /rulesets:
+    get:
+      tags:
+      - rulesets
+      summary: "Get the available rulesets"
+      description: "Get the available runsets"
+      operationId: "getRulesets"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Ruleset"
+      x-swagger-router-controller: "RulesetController"
+  /rulesets/${rulesetName}:
+    get:
+      tags:
+      - rulesets
+      summary: "Get a ruleset"
+      description: "Get a ruleset"
+      operationId: "getRuleset"
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: "rulesetName"
+        description: "Unique ruleset name"
+        required: true
+        type: string
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            items:
+              $ref: "#/definitions/RulesetDefinition"
+      x-swagger-router-controller: "RulesetController" 
+  /admin/rulesets:      
+    post:
+      tags:
+      - admin/rulesets
+      summary: "Add a rulesets"
+      description: "Add a rulesets"
+      operationId: "addRulesets"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "addRulesetsRequest"
+        description: "Ruleset definitions to add"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/RulesetDefinition"
+      responses:
+        "201":
+          description: "successful operation"
+        "405":
+          description: "Invalid input"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Error"
+      x-swagger-router-controller: "RulesetController"
+  /admin/rulesets/${rulesetName}:
+    delete:
+      tags:
+      - admin/rulesets
+      summary: "Delete a ruleset"
+      description: "Delete a ruleset"
+      operationId: "deleteRuleset"
+      parameters:
+      - in: path
+        name: "rulesetName"
+        description: "Unique ruleset name"
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      x-swagger-router-controller: "RulesetController"
+    put:
+      tags:
+      - admin/rulesets
+      summary: "Update a ruleset"
+      description: "Update a ruleset"
+      operationId: "updateRuleset"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: path
+        name: "rulesetName"
+        description: "Unique ruleset name"
+        required: true
+        type: string
+      - in: "body"
+        name: "updateRulesetRequest"
+        description: "Ruleset definitions to add"
+        required: true
+        schema:
+          type: "object"
+          items:
+            $ref: "#/definitions/RulesetDefinition"        
+      responses:
+        "201":
+          description: OK
+        "405":
+          description: "Invalid input"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Error"
+      x-swagger-router-controller: "RulesetController"       
+  /functions:
+    get:
+      tags:
+      - functions
+      summary: "Get the available functions"
+      description: "Get the available functions"
+      operationId: "getFunctions"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Function"
+      x-swagger-router-controller: "FunctionController"
+  /functions/${functionName}:
+    get:
+      tags:
+      - functions
+      summary: "Get a function"
+      description: "Get a function"
+      operationId: "getFunction"
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: "functionName"
+        description: "Unique function name"
+        required: true
+        type: string
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            items:
+              $ref: "#/definitions/FunctionDefinition"
+      x-swagger-router-controller: "FunctionController"
+  /admin/functions:
+    post:
+      tags:
+      - admin/functions
+      summary: "Add functions"
+      description: "Add functions"
+      operationId: "addFunctions"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "addFunctionsRequest"
+        description: "Function definitions to add"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/FunctionDefinition"
+      responses:
+        "201":
+          description: "successful operation"
+        "405":
+          description: "Invalid input"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Error"
+      x-swagger-router-controller: "FunctionController"
+  /admin/functions/${functionName}:
+    delete:
+      tags:
+      - admin/functions
+      summary: "Delete a function"
+      description: "Delete a function"
+      operationId: "deleteFunction"
+      parameters:
+      - in: path
+        name: "functionName"
+        description: "Unique function name"
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      x-swagger-router-controller: "FunctionController"
+    put:
+      tags:
+      - admin/functions
+      summary: "Update a function"
+      description: "Update a function"
+      operationId: "updateFunction"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: path
+        name: "functionName"
+        description: "Unique function name"
+        required: true
+        type: string
+      - in: "body"
+        name: "updateFunctionRequest"
+        description: "Function definitions to add"
+        required: true
+        schema:
+          type: "object"
+          items:
+            $ref: "#/definitions/FunctionDefinition"        
+      responses:
+        "201":
+          description: OK
+        "405":
+          description: "Invalid input"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Error"
+      x-swagger-router-controller: "FunctionController"  
+  /admin/logging:
+    put:
+      tags:
+      - admin/logging
+      summary: "Update logging"
+      description: "Update logging"
+      operationId: "updateLogging"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "updateLoggingRequest"
+        description: "Logging criteria"
+        required: true
+        schema:
+          type: "object"
+          items:
+            $ref: "#/definitions/LoggingDefinition"        
+      responses:
+        "201":
+          description: OK
+        "405":
+          description: "Invalid input"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Error"
+      x-swagger-router-controller: "LoggingController" 
+    get:
+      tags:
+      - admin/logging
+      summary: "get logging"
+      description: "get logging"
+      operationId: "getLogging"
+      consumes:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            items:
+              $ref: "#/definitions/LoggingDefinition"
+        "405":
+          description: "Invalid input"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Error"
+      x-swagger-router-controller: "LoggingController"  
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  LintRequest:
+    type: "object"
+    required:
+    - "spec"
+    properties:
+      ruleset:
+        type: "string"
+        description: "One of the provided rulesets"
+      spec:
+        type: "object"
+        description: "A json representation of the specification"
+    example:
+      ruleset: "ruleset"
+      spec: "spec"
+  LintResponse:
+    type: "object"
+    properties:
+      ruleset:
+        type: "object"
+        properties:
+          name:
+            type: "string"
+          version:
+            type: "string"
+      results:
+        type: "array"
+        items:
+          $ref: "#/definitions/Result"
+    example:
+      ruleset:
+      - name: "name"
+        version: "1.0"
+      results:
+      - line: 0
+        type: "type"
+        message: "message"
+  Result:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+      line:
+        type: "integer"
+      message:
+        type: "string"
+    example:
+      line: 0
+      type: "type"
+      message: "message"
+  Ruleset:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      description:
+        type: "string"
+    example:
+      name: "name"
+      description: "description"
+  RulesetDefinition:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      description:
+        type: "string"
+      ruleset:
+        type: "object"
+        description: "The ruleset"
+        properties: {}
+  Function:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+    example:
+      name: "uppercase"
+  FunctionDefinition:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      function:
+        type: "string"
+        format: "bytes"
+        description: "The function contents"
+  LoggingDefinition:
+    type: "object"
+    required: 
+      - level
+    properties:
+      level:
+        type: "string"
+        description: "error,warn,info,verbose,debug,silly"
+    example:
+      level: "error|warn|info|verbose|debug|silly"       
+  Error:
+    type: "object"
+    properties:
+      message:
+        type: "string"
